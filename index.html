@@ -3,18 +3,41 @@
 
 <head>
   <meta charset="UTF-8">
-  <title>Audio Visualization</title>
+  <title>Stay Alive</title>
+  <link rel="shortcut icon" href="favicon.png" type="image/x-icon">
   <style>
+    body {
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: #1a1929;
+    }
+
+    .vh-bolang {
+      opacity: 0.3;
+    }
+
+    .center {
+      margin-top: -20vh;
+    }
+
     #canvas {
-      border: 1px solid black;
+      /* border: 1px solid black; */
       display: block;
+      margin: 20px auto;
     }
   </style>
 </head>
 
 <body>
-  <audio id="audio" src="stayAlive.mp3" controls></audio>
-  <canvas id="canvas" width="200" height="200"></canvas>
+  <div class="center">
+    <!-- 画布 -->
+    <canvas id="canvas" width="200" height="200"></canvas>
+    <audio id="audio" src="stayAlive.mp3" controls></audio>
+  </div>
+  <script src="https://api.vvhan.com/api/script/bolang"></script>
   <script>
     const canvas = document.getElementById('canvas');
     const ctx = canvas.getContext('2d');
@@ -46,10 +69,10 @@
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         analyzer.getByteFrequencyData(frequencyData);
         const radius = frequencyData.reduce((a, b) => a + b, 0) / frequencyData.length;
-        console.log(radius)
+        // console.log(radius)
         ctx.beginPath();
         ctx.arc(canvas.width / 2, canvas.height / 2, radius, 0, 2 * Math.PI);
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+        ctx.fillStyle = 'rgba(255,255,255,0.1)';
         ctx.fill();
         requestAnimationFrame(drawCircle);
       }
