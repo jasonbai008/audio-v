@@ -21,6 +21,13 @@
       opacity: 0.3;
     }
 
+    .vh-bg {
+      width: 100vw;
+      height: 100vh;
+      position: fixed;
+      z-index: -1;
+    }
+
     .center {
       margin-top: -20vh;
     }
@@ -30,6 +37,7 @@
       display: block;
       margin: 20px auto;
     }
+   
   </style>
 </head>
 
@@ -40,6 +48,12 @@
     <!-- 音频源 -->
     <audio id="audio" src="stayAlive.mp3" controls></audio>
   </div>
+
+  <!-- 单独定位的星空背景 -->
+  <canvas class="vh-bg"></canvas>
+
+  <!-- 星空背景脚本 -->
+  <script src="sky.js"></script>
 
   <!-- 底部波浪效果插件 -->
   <script src="https://api.vvhan.com/api/script/bolang"></script>
@@ -104,7 +118,7 @@
       gradient.addColorStop(0.7, '#FFE000');
       gradient.addColorStop(0, '#ED213A');
 
-      ctx.lineWidth = 3;
+      ctx.lineWidth = 2;
       ctx.strokeStyle = gradient;
       ctx.stroke()
       // 使用requestAnimationFrame来实现动画效果
