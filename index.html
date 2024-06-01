@@ -98,7 +98,14 @@
       ctx.beginPath();
       // 以画布中心点，绘制圆弧，圆弧半径是radius，圆弧起始角度是0，结束角度是2π
       ctx.arc(canvas.width / 2, canvas.height / 2, radius, 0, 2 * Math.PI);
-      ctx.strokeStyle = "#fff";
+
+      var gradient = ctx.createLinearGradient(0, 0, 0, 300);
+      gradient.addColorStop(1, '#c31432');
+      gradient.addColorStop(0.7, '#FFE000');
+      gradient.addColorStop(0, '#ED213A');
+
+      ctx.lineWidth = 3;
+      ctx.strokeStyle = gradient;
       ctx.stroke()
       // 使用requestAnimationFrame来实现动画效果
       requestAnimationFrame(drawCircle);
