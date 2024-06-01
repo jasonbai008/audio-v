@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <title>Audio Visualization</title>
+  <style>
+    #canvas {
+      border: 1px solid black;
+      display: block;
+    }
+  </style>
+</head>
+
+<body>
+  <audio id="audio" src="stayAlive.mp3" controls></audio>
+  <canvas id="canvas" width="200" height="200"></canvas>
+  <script>
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    const audio = document.getElementById('audio');
+
+    // 允许跨域请求音频资源
+    audio.crossOrigin = 'anonymous'
+
+    audio.onplay = () => {
+      // 创建 Web Audio API 的 Context
+      const audioContext = new AudioContext();
+
+      // 创建音频源
+      const source = audioContext.createMediaElementSource(audio);
+
+      // 创建分析器
+      const analyzer = audioContext.createAnalyser();
+
+      // 连接音频源和分析器
+      source.connect(analyzer);
+      analyzer.connect(audioContext.destination);
+
+      // 获取音频信息
+      analyzer.fftSize = 256;
+      const frequencyData = new Uint8Array(analyzer.frequencyBinCount);
+
+      // 绘制圆圈
+      function drawCircle() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        analyzer.getByteFrequencyData(frequencyData);
+        const radius = frequencyData.reduce((a, b) => a + b, 0) / frequencyData.length;
+        console.log(radius)
+        ctx.beginPath();
+        ctx.arc(canvas.width / 2, canvas.height / 2, radius, 0, 2 * Math.PI);
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+        ctx.fill();
+        requestAnimationFrame(drawCircle);
+      }
+
+      drawCircle();
+    }
+
+  </script>
+</body>
+
+</html>
