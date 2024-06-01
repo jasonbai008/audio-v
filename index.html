@@ -36,20 +36,39 @@
 <body>
   <div class="center">
     <!-- 画布 -->
-    <canvas id="canvas" width="200" height="200"></canvas>
+    <canvas id="canvas" width="220" height="220"></canvas>
+    <!-- 音频源 -->
     <audio id="audio" src="stayAlive.mp3" controls></audio>
   </div>
 
+  <!-- 底部波浪效果插件 -->
   <script src="https://api.vvhan.com/api/script/bolang"></script>
   <script>
     const canvas = document.getElementById('canvas');
     const ctx = canvas.getContext('2d');
     const audio = document.getElementById('audio');
 
+    let isInit = false  // 初始化一次的锁
+    let analyzer = null
+    let frequencyData = null
+
     // 允许跨域请求音频资源
     audio.crossOrigin = 'anonymous'
 
+    // 播放音频的时候执行：
     audio.onplay = () => {
+      // 如果已经初始化了，就不要再初始化了
+      if (isInit) return;
+
+      handleAudio()
+      drawCircle();
+
+      // 确保只初始化一次
+      isInit = true
+    }
+
+    // 分析加工音频数据
+    function handleAudio() {
       // 创建 Web Audio API 的 Context
       const audioContext = new AudioContext();
 
@@ -57,30 +76,32 @@
       const source = audioContext.createMediaElementSource(audio);
 
       // 创建分析器
-      const analyzer = audioContext.createAnalyser();
+      analyzer = audioContext.createAnalyser();
 
       // 连接音频源和分析器
       source.connect(analyzer);
       analyzer.connect(audioContext.destination);
 
-      // 获取音频信息
-      analyzer.fftSize = 256;
-      const frequencyData = new Uint8Array(analyzer.frequencyBinCount);
+      // 获取音频信息:值需要是2的n次方
+      analyzer.fftSize = 512;
+      frequencyData = new Uint8Array(analyzer.frequencyBinCount);
+    }
 
-      // 绘制圆圈
-      function drawCircle() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        analyzer.getByteFrequencyData(frequencyData);
-        const radius = frequencyData.reduce((a, b) => a + b, 0) / frequencyData.length;
-        // console.log(radius)
-        ctx.beginPath();
-        ctx.arc(canvas.width / 2, canvas.height / 2, radius, 0, 2 * Math.PI);
-        ctx.fillStyle = 'rgba(255,255,255,0.1)';
-        ctx.fill();
-        requestAnimationFrame(drawCircle);
-      }
-
-      drawCircle();
+    // 绘制圆圈【在第一次播放音乐后，这个函数会一直执行，因为我没有写中断执行的逻辑】
+    function drawCircle() {
+      // 先清空画布
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      // 提取音频数据
+      analyzer.getByteFrequencyData(frequencyData);
+      // 计算圆形的半径：累加音频所有数据/数据长度
+      const radius = frequencyData.reduce((a, b) => a + b, 0) / frequencyData.length;
+      ctx.beginPath();
+      // 以画布中心点，绘制圆弧，圆弧半径是radius，圆弧起始角度是0，结束角度是2π
+      ctx.arc(canvas.width / 2, canvas.height / 2, radius, 0, 2 * Math.PI);
+      ctx.strokeStyle = "#fff";
+      ctx.stroke()
+      // 使用requestAnimationFrame来实现动画效果
+      requestAnimationFrame(drawCircle);
     }
 
   </script>
